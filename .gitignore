@@ -1,0 +1,19 @@
+# Ignore Python virtual environments
+venv/
+env/
+.venv/
+.conda/
+.venv.bak/
+
+# Ignore virtual environment files
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Ignore system-specific virtual environments
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Ignore VS Code settings and workspace files
+.vscode/
