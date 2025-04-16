@@ -1,0 +1,15 @@
+# tools/build_faiss_index.py
+
+import pandas as pd
+import faiss
+import numpy as np
+from sentence_transformers import SentenceTransformer
+
+model = SentenceTransformer("all-MiniLM-L6-v2")
+df = pd.read_csv("data/recipes.csv")
+embeddings = model.encode(df["title"].tolist(), convert_to_numpy=True).astype("float32")
+
+index = faiss.IndexFlatL2(embeddings.shape[1])
+index.add(embeddings)
+
+faiss.write_index(index, "models/recipe_index.faiss")
