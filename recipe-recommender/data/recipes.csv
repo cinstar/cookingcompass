@@ -1,0 +1,4 @@
+id,title,ingredients,diet_label,url
+1,Chickpea Curry,"chickpeas, garlic, onion, tomato, cumin",vegan,https://example.com/chickpea-curry
+2,Chicken Alfredo,"chicken, cream, pasta, garlic, parmesan",none,https://example.com/chicken-alfredo
+3,Tofu Stir Fry,"tofu, soy sauce, bell pepper, broccoli",vegetarian,https://example.com/tofu-stir-fry
