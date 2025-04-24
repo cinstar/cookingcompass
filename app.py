@@ -54,6 +54,7 @@ rating_categories = ["Any", "4.0 and above", "3.0–3.9", "Below 3.0"]
 
 
 
+search_term = st.text_input("Search by Recipe Name")
 
 
 # UI layout
@@ -83,6 +84,9 @@ with col3:
 # Filter button
 if st.button("🔍 Search Recipes"):
     filtered = recipe_data.copy()
+
+    if search_term:
+        filtered = filtered[filtered["recipe_name"].str.contains(search_term, case=False, na=False)]
 
     if selected_ingredients:
         filtered = filtered[filtered['ingredient_list'].apply(lambda x: all(i in x for i in selected_ingredients))]
