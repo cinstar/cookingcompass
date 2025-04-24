@@ -5,6 +5,8 @@ import ast
 # Load the DataFrame
 recipe_data = pd.read_csv("recipe_data.csv")
 
+#-------------------------------------------------------
+#THE FOLLOWING CODE CATEGORIZES RECIPE RATINGS INTO THREE RANGES
 # Function to categorize ratings
 def categorize_rating(r):
     try:
@@ -20,6 +22,13 @@ def categorize_rating(r):
 
 # Apply categorization
 recipe_data["rating_category"] = recipe_data["rating"].apply(categorize_rating)
+
+#-------------------------------------------------------
+
+#THE FOLLOWING CODE FORMATS THE DIETARY LABEL
+# Normalize Dietary Label values
+recipe_data["Dietary Label"] = recipe_data["Dietary Label"].str.strip().str.capitalize()
+recipe_data["Dietary Label"] = recipe_data["Dietary Label"].fillna("None")
 
 # Convert ingredient_list from string to list
 recipe_data['ingredient_list'] = recipe_data['ingredient_list'].apply(ast.literal_eval)
