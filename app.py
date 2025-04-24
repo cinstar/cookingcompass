@@ -26,7 +26,8 @@ recipe_data['ingredient_list'] = recipe_data['ingredient_list'].apply(ast.litera
 
 # Streamlit app config
 st.set_page_config(page_title="Recipe Finder", layout="centered")
-st.title("🍽️ Find a Recipe")
+st.title("🍳🧭 Cooking Compass")
+st.subheader("🍽️ Find a Recipe")
 
 # Replace NaN with readable string for dropdowns
 recipe_data.fillna("Missing", inplace=True)
@@ -71,7 +72,7 @@ with col3:
 #     selected_total = st.selectbox("Total Time", ["Any"] + total_times)
 
 # Filter button
-if st.button("Search Recipes"):
+if st.button("🔍 Search Recipes"):
     filtered = recipe_data.copy()
 
     if selected_ingredients:
@@ -90,43 +91,41 @@ if st.button("Search Recipes"):
 
     filtered = filtered.sort_values(by="rating", ascending=False)
 
-
-    # st.subheader("🍏 Matching Recipes")
-        
-
     if not filtered.empty:
-        st.subheader(f"🍏 Found {len(filtered)} Recipe(s):")
+        st.subheader(f"🍜 Found {len(filtered)} Recipe(s):")
 
         for _, row in filtered.iterrows():
             st.markdown("---")
 
-            # Centered, smaller image
-            st.markdown(
-                f"""
-                <div style='text-align: center;'>
-                    <img src="{row['img_src']}" style='max-width: 300px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 10px;' />
-                </div>
-                """,
-                unsafe_allow_html=True
-            )
+            col1, col2 = st.columns([1, 2])
 
-            # Recipe name as clickable link
-            st.markdown(f"### [{row['recipe_name']}]({row['url']})")
+            with col1:
+                st.image(row['img_src'], width=200)
 
-            # Time info
-            time_parts = []
-            if row.get("prep_time") != "Missing":
-                time_parts.append(f"🕒 **Prep:** {row['prep_time']}")
-            if row.get("cook_time") != "Missing":
-                time_parts.append(f"🔥 **Cook:** {row['cook_time']}")
-            if row.get("total_time") != "Missing":
-                time_parts.append(f"⏱️ **Total:** {row['total_time']}")
-            st.markdown(" &nbsp; | &nbsp; ".join(time_parts))
+            with col2:
+                # Recipe name as clickable link
+                st.markdown(f"### [{row['recipe_name']}]({row['url']})")
 
-    else:
-        st.markdown(
-            "<div style='color: #ff8800; font-size: 1.2rem;'>"
-            "🍽️ Nothing matched! Maybe try fewer ingredients or a different cook time?"
-            "</div>",
-            unsafe_allow_html=True
-        )
+                # Time info
+                time_parts = []
+                if row.get("prep_time") != "Missing":
+                    time_parts.append(f"⏳ **Prep:** {row['prep_time']}")
+                if row.get("cook_time") != "Missing":
+                    time_parts.append(f"🔥 **Cook:** {row['cook_time']}")
+                if row.get("total_time") != "Missing":
+                    time_parts.append(f"⏱️ **Total:** {row['total_time']}")
+                st.markdown(" &nbsp; | &nbsp; ".join(time_parts))
+
+                # Dietary label and rating
+                if row.get("Dietary Label"):
+                    st.markdown(f"🥗 **Diet:** {row['Dietary Label'].capitalize()}")
+                if row.get("rating"):
+                    st.markdown(f"⭐ **Rating:** {row['rating']}/5")
+
+                # Expandable ingredients
+                st.markdown(f"""
+                <details>
+                    <summary style='font-size:15px;'>🧾 View Ingredients</summary>
+                    <p>{', '.join(row['ingredient_list'])}</p>
+                </details>
+                """, unsafe_allow_html=True)
