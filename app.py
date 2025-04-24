@@ -5,6 +5,22 @@ import ast
 # Load the DataFrame
 recipe_data = pd.read_csv("recipe_data.csv")
 
+# Function to categorize ratings
+def categorize_rating(r):
+    try:
+        r = float(r)
+        if r >= 4.0:
+            return "4.0 and above"
+        elif r >= 3.0:
+            return "3.0–3.9"
+        else:
+            return "Below 3.0"
+    except:
+        return "Missing"
+
+# Apply categorization
+recipe_data["rating_category"] = recipe_data["rating"].apply(categorize_rating)
+
 # Convert ingredient_list from string to list
 recipe_data['ingredient_list'] = recipe_data['ingredient_list'].apply(ast.literal_eval)
 
@@ -23,7 +39,10 @@ cook_times = sorted(recipe_data["cook_time"].unique())
 total_times = sorted(recipe_data["total_time"].unique())
 dietary_labels = sorted(recipe_data["Dietary Label"].dropna().unique())
 prep_times = sorted(recipe_data["prep_time"].unique())
-ratings = sorted(recipe_data["rating"].dropna().unique())
+rating_categories = ["Any", "4.0 and above", "3.0–3.9", "Below 3.0"]
+
+
+
 
 
 
@@ -39,8 +58,9 @@ with col2:
     selected_cook = st.selectbox("Cook Time", ["Any"] + cook_times)
 
 with col3:
-    selected_rating = st.selectbox("Ratings", ["Any"] + ratings)
+    selected_rating = st.selectbox("Rating Category", rating_categories, key="rating_category")
     selected_total = st.selectbox("Total Time", ["Any"] + total_times)
+
 
 
 # with col1:
@@ -65,7 +85,8 @@ if st.button("Search Recipes"):
     if selected_diet != "Any":
         filtered = filtered[filtered["Dietary Label"] == selected_diet]
     if selected_rating != "Any":
-        filtered = filtered[filtered["rating"].astype(str) == selected_rating]
+        filtered = filtered[filtered["rating_category"] == selected_rating]
+
 
     filtered = filtered.sort_values(by="rating", ascending=False)
 
