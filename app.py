@@ -4,6 +4,7 @@ import ast
 
 # Load the DataFrame
 recipe_data = pd.read_csv("recipe_data.csv")
+recipe_data["rating"] = pd.to_numeric(recipe_data["rating"], errors="coerce")
 
 #-------------------------------------------------------
 #THE FOLLOWING CODE CATEGORIZES RECIPE RATINGS INTO THREE RANGES
@@ -52,34 +53,57 @@ prep_times = sorted(recipe_data["prep_time"].unique())
 rating_categories = ["Any", "4.0 and above", "3.0–3.9", "Below 3.0"]
 
 
+# defining dropdown ranges for total_times
+time_ranges = {
+    "Any": (0, float("inf")),
+    "0–29 mins": (0, 30),
+    "30–59 mins": (30, 60),
+    "1-2 hrs": (60, 120),
+    "2-3 hrs": (120, 180),
+    "3+ hrs": (180, float("inf"))
+}
 
 
+
+
+st.markdown("<div style='height:34px'></div>", unsafe_allow_html=True)
 search_term = st.text_input("Search by Recipe Name")
-
+st.markdown("<div style='height:34px'></div>", unsafe_allow_html=True)
 
 # UI layout
 col1, col2, col3 = st.columns(3)
 
 with col1:
-    selected_ingredients = st.multiselect("Ingredients", all_ingredients)
-    selected_prep = st.selectbox("Prep Time", ["Any"] + prep_times)
+    selected_ingredients = st.multiselect("🧅 Ingredients", all_ingredients)
+    # st.markdown("<br>", unsafe_allow_html=True)
+
+    # Spacer to align vertically with Total Time
+    st.markdown("<div style='height:34px'></div>", unsafe_allow_html=True)
+    selected_prep = st.selectbox("⏳ Prep Time", ["Any"] + prep_times)
 
 with col2:
-    selected_diet = st.selectbox("Dietary Label", ["Any"] + dietary_labels)
-    selected_cook = st.selectbox("Cook Time", ["Any"] + cook_times)
+    selected_diet = st.selectbox("🥗 Dietary Label", ["Any"] + dietary_labels)
+    # st.markdown("<br>", unsafe_allow_html=True)
+
+    # Spacer to align vertically with Total Time
+    st.markdown("<div style='height:34px'></div>", unsafe_allow_html=True)
+    selected_cook = st.selectbox("🔥 Cook Time", ["Any"] + cook_times)
 
 with col3:
-    selected_rating = st.selectbox("Rating Category", rating_categories, key="rating_category")
-    selected_total = st.selectbox("Total Time", ["Any"] + total_times)
+    min_rating, max_rating = st.slider(
+        "⭐ Rating",
+        min_value=0.0,
+        max_value=5.0,
+        value=(0.0, 5.0),
+        step=0.1,
+        format="%.1f"
+    )
+    # st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown("<div style='height:20px'></div>", unsafe_allow_html=True)
 
+    selected_total_range_label = st.selectbox("⏱️ Total Time", list(time_ranges.keys()))
 
-
-# with col1:
-#     selected_ingredients = st.multiselect("Ingredients", all_ingredients)
-
-# with col2:
-#     selected_cook = st.selectbox("Cook Time", ["Any"] + cook_times)
-#     selected_total = st.selectbox("Total Time", ["Any"] + total_times)
+st.markdown("<div style='height:34px'></div>", unsafe_allow_html=True)
 
 # Filter button
 if st.button("🔍 Search Recipes"):
@@ -94,12 +118,36 @@ if st.button("🔍 Search Recipes"):
         filtered = filtered[filtered["cook_time"] == selected_cook]
     if selected_prep != "Any":
         filtered = filtered[filtered["prep_time"] == selected_prep]
-    if selected_total != "Any":
-        filtered = filtered[filtered["total_time"] == selected_total]
+
+    # changing total_time dropdown to cleaned_total_time slider
+    # if selected_total != "Any":
+    #     filtered = filtered[filtered["total_time"] == selected_total]
+
+    # filtered = filtered[
+    #     (filtered["cleaned_total_time"] >= selected_total_range[0]) &
+    #     (filtered["cleaned_total_time"] <= selected_total_range[1])
+    #     ]
+    filtered['cleaned_total_time'] = pd.to_numeric(
+    filtered['cleaned_total_time'], errors='coerce'
+    )
+    if selected_total_range_label != "Any":
+        min_time, max_time = time_ranges[selected_total_range_label]
+        filtered = filtered[
+            (filtered['cleaned_total_time'] >= min_time) &
+            (filtered['cleaned_total_time'] < max_time)
+        ]
+
+
+
     if selected_diet != "Any":
         filtered = filtered[filtered["Dietary Label"] == selected_diet]
-    if selected_rating != "Any":
-        filtered = filtered[filtered["rating_category"] == selected_rating]
+    
+    filtered = filtered[
+    (filtered["rating"] >= min_rating) & (filtered["rating"] <= max_rating)
+    ]
+
+    # if selected_rating != "Any":
+    #     filtered = filtered[filtered["rating_category"] == selected_rating]
 
 
     filtered = filtered.sort_values(by="rating", ascending=False)
@@ -142,3 +190,5 @@ if st.button("🔍 Search Recipes"):
                     <p>{', '.join(row['ingredient_list'])}</p>
                 </details>
                 """, unsafe_allow_html=True)
+
+
