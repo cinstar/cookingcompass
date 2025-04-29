@@ -1,7 +1,6 @@
 import streamlit as st
 import pandas as pd
 import ast
-# from PIL import Image
 
 # Load the DataFrame
 recipe_data = pd.read_csv("recipe_data.csv")
@@ -39,11 +38,8 @@ for col in recipe_data.select_dtypes(include="number").columns:
 all_ingredients = sorted(
     set(ingredient for sublist in recipe_data['ingredient_list'] for ingredient in sublist)
 )
-# cook_times = sorted(recipe_data["cook_time"].unique())
 total_times = sorted(recipe_data["total_time"].unique())
 dietary_labels = sorted(recipe_data["Dietary Label"].dropna().unique())
-# prep_times = sorted(recipe_data["prep_time"].unique())
-# rating_categories = ["Any", "4.0 and above", "3.0–3.9", "Below 3.0"]
 
 
 # defining dropdown ranges for total_times
@@ -56,10 +52,6 @@ time_ranges = {
     "3+ hrs": (180, float("inf"))
 }
 
-
-
-
-# st.markdown("<div style='height:34px'></div>", unsafe_allow_html=True)
 search_term = st.text_input("Search by Recipe Name")
 
 # UI layout
@@ -72,7 +64,6 @@ with col2:
     selected_diet = st.selectbox("🥗 Dietary Label", ["Any"] + dietary_labels)
 
 with col3:
-
     selected_total_range_label = st.selectbox("⏱️ Prep + Cook Time", list(time_ranges.keys()))
 
 min_rating, max_rating = st.slider(
@@ -121,7 +112,7 @@ if search_clicked:
         (filtered["rating"] >= min_rating) & (filtered["rating"] <= max_rating)
     ]
 
-    # --- 🧹 SORT THE RESULTS (based on the dropdown & toggle) ---
+    # --- SORT THE RESULTS (based on the dropdown & toggle) ---
     if sort_option == "Alphabetical":
         filtered = filtered.sort_values(by="recipe_name", ascending=sort_ascending)
     elif sort_option == "Rating":
@@ -135,7 +126,7 @@ if search_clicked:
     if not filtered.empty:
         st.subheader(f"🍜 Found {len(filtered)} Recipe(s):")
         for _, row in filtered.iterrows():
-            # your recipe card display code here (unchanged)
+            # recipe card display
             st.markdown("---")
 
             col1, col2 = st.columns([1, 2])
