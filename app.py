@@ -1,10 +1,16 @@
 import streamlit as st
 import pandas as pd
 import ast
+import csv
 
 # Load the DataFrame
 recipe_data = pd.read_csv("recipe_data.csv")
 recipe_data["rating"] = pd.to_numeric(recipe_data["rating"], errors="coerce")
+ingredient_bank = []
+with open("ingredientbank.csv", 'r') as file:
+    csv_reader = csv.reader(file)
+    for row in csv_reader:
+        ingredient_bank.append(row[0])
 
 #THE FOLLOWING CODE FORMATS THE DIETARY LABEL
 # Normalize Dietary Label values
@@ -35,9 +41,10 @@ for col in recipe_data.select_dtypes(include="number").columns:
 
 
 # Get unique values for dropdowns
-all_ingredients = sorted(
-    set(ingredient for sublist in recipe_data['ingredient_list'] for ingredient in sublist)
-)
+# all_ingredients = sorted(
+#     set(ingredient for sublist in recipe_data['ingredient_list'] for ingredient in sublist)
+# )
+all_ingredients = ingredient_bank
 total_times = sorted(recipe_data["total_time"].unique())
 dietary_labels = sorted(recipe_data["Dietary Label"].dropna().unique())
 
